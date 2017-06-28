@@ -17,30 +17,32 @@ public struct CGFloat {
     /// The native type used to store the CGFloat, which is Float on
     /// 32-bit architectures and Double on 64-bit architectures.
     public typealias NativeType = Double
+#else
+    public typealias NativeType = Float
 #endif
-    
+
     @_transparent public init() {
         self.native = 0.0
     }
-    
+
     @_transparent public init(_ value: Float) {
         self.native = NativeType(value)
     }
-    
+
     @_transparent public init(_ value: Double) {
         self.native = NativeType(value)
     }
-    
+
 #if !os(Windows) && (arch(i386) || arch(x86_64))
     @_transparent public init(_ value: Float80) {
         self.native = NativeType(value)
     }
 #endif
-    
+
     @_transparent public init(_ value: CGFloat) {
         self.native = value.native
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -50,7 +52,7 @@ public struct CGFloat {
     public init(_ value: UInt8) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -60,7 +62,7 @@ public struct CGFloat {
     public init(_ value: Int8) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -70,7 +72,7 @@ public struct CGFloat {
     public init(_ value: UInt16) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -80,7 +82,7 @@ public struct CGFloat {
     public init(_ value: Int16) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -90,7 +92,7 @@ public struct CGFloat {
     public init(_ value: UInt32) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -100,7 +102,7 @@ public struct CGFloat {
     public init(_ value: Int32) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -110,7 +112,7 @@ public struct CGFloat {
     public init(_ value: UInt64) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -120,7 +122,7 @@ public struct CGFloat {
     public init(_ value: Int64) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -130,7 +132,7 @@ public struct CGFloat {
     public init(_ value: UInt) {
         self.native = NativeType(value)
     }
-    
+
     /// Creates a new value, rounded to the closest possible representatation.
     ///
     /// If two representable values are equally close, the result is the value
@@ -140,7 +142,7 @@ public struct CGFloat {
     public init(_ value: Int) {
         self.native = NativeType(value)
     }
-    
+
     /// The native value.
     public var native: NativeType
 }
@@ -159,7 +161,7 @@ extension CGFloat : SignedNumeric {
 }
 
 extension CGFloat : BinaryFloatingPoint {
-    
+
     public typealias RawSignificand = UInt
     public typealias Exponent = Int
 
@@ -167,12 +169,12 @@ extension CGFloat : BinaryFloatingPoint {
     public static var exponentBitCount: Int {
         return NativeType.exponentBitCount
     }
-    
+
     @_transparent
     public static var significandBitCount: Int {
         return NativeType.significandBitCount
     }
-    
+
     //  Conversions to/from integer encoding.  These are not part of the
     //  BinaryFloatingPoint prototype because there's no guarantee that an
     //  integer type of the same size actually exists (e.g. Float80).
@@ -187,6 +189,8 @@ extension CGFloat : BinaryFloatingPoint {
         native = NativeType(bitPattern: UInt32(bitPattern))
 #elseif arch(x86_64) || arch(arm64) || arch(s390x) || arch(powerpc64) || arch(powerpc64le)
         native = NativeType(bitPattern: UInt64(bitPattern))
+#else
+        native = NativeType(bitPattern: UInt32(bitPattern))
 #endif
     }
 
@@ -429,12 +433,12 @@ extension CGFloat {
     public static var min: CGFloat {
         fatalError("unavailable")
     }
-    
+
     @available(*, unavailable, renamed: "greatestFiniteMagnitude")
     public static var max: CGFloat {
         fatalError("unavailable")
     }
-    
+
     @available(*, unavailable, message: "Please use the `abs(_:)` free function")
     public static func abs(_ x: CGFloat) -> CGFloat {
         fatalError("unavailable")
@@ -616,7 +620,7 @@ extension CGFloat : Strideable {
     public func distance(to other: CGFloat) -> CGFloat {
         return CGFloat(other.native - self.native)
     }
-    
+
     /// Returns a `Self` `x` such that `self.distance(to: x)` approximates
     /// `n`.
     ///
@@ -941,11 +945,11 @@ extension CGFloat : _CVarArgPassedAsDouble, _CVarArgAligned {
     public var _cVarArgEncoding: [Int] {
         return native._cVarArgEncoding
     }
-    
-    /// Return the required alignment in bytes of 
+
+    /// Return the required alignment in bytes of
     /// the value returned by `_cVarArgEncoding`.
     @_transparent
-    public var _cVarArgAlignment: Int { 
+    public var _cVarArgAlignment: Int {
         return native._cVarArgAlignment
     }
 }
