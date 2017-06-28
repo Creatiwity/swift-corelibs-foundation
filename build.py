@@ -63,7 +63,8 @@ foundation.CFLAGS += " ".join([
 	'-Wno-unused-function',
 	'-I${SYSROOT}/usr/include/libxml2',
 	'-I${SYSROOT}/usr/include/curl',
-	'-I./',
+	'-I./closure',
+	'-I./'
 ])
 
 swift_cflags += [
