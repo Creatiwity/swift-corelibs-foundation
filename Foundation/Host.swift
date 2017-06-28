@@ -10,7 +10,7 @@
 
 #if os(OSX) || os(iOS)
 import Darwin
-#elseif os(Linux) || CYGWIN
+#elseif os(Linux) || os(Android) || CYGWIN
 import Glibc
 #endif
 
@@ -81,7 +81,14 @@ open class Host: NSObject {
                 let family = ifa_addr.pointee.sa_family
                 if family == sa_family_t(AF_INET) || family == sa_family_t(AF_INET6) {
                     let sa_len: socklen_t = socklen_t((family == sa_family_t(AF_INET6)) ? MemoryLayout<sockaddr_in6>.size : MemoryLayout<sockaddr_in>.size)
-                    if getnameinfo(ifa_addr, sa_len, address, socklen_t(NI_MAXHOST), nil, 0, NI_NUMERICHOST) == 0 {
+                    
+                    #if os(Android)
+                        let niMaxHost = Int(NI_MAXHOST)
+                    #else
+                        let niMaxHost = socklen_t(NI_MAXHOST)
+                    #endif
+                    
+                    if getnameinfo(ifa_addr, sa_len, address, niMaxHost, nil, 0, NI_NUMERICHOST) == 0 {
                         _addresses.append(String(cString: address))
                     }
                 }
@@ -137,8 +144,15 @@ open class Host: NSObject {
                     continue
                 }
                 let sa_len: socklen_t = socklen_t((family == AF_INET6) ? MemoryLayout<sockaddr_in6>.size : MemoryLayout<sockaddr_in>.size)
+                
+                #if os(Android)
+                    let niMaxHost = Int(NI_MAXHOST)
+                #else
+                    let niMaxHost = socklen_t(NI_MAXHOST)
+                #endif
+                
                 let lookupInfo = { (content: inout [String], flags: Int32) in
-                    if getnameinfo(info.ai_addr, sa_len, host, socklen_t(NI_MAXHOST), nil, 0, flags) == 0 {
+                    if getnameinfo(info.ai_addr, sa_len, host, niMaxHost, nil, 0, flags) == 0 {
                         content.append(String(cString: host))
                     }
                 }
